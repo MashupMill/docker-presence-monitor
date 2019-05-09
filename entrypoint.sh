@@ -24,7 +24,7 @@ if [[ ! -z "$1" ]] && ( [[ -f "$1" ]] || command -v $1 &> /dev/null );  then
     "${@}"
     exit $?
 else
-    monitor "${@}"
+    ./monitor.sh -D /config "${@}"
     exit $?
 fi
 

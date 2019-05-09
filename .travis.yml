@@ -1,0 +1,48 @@
+sudo: true
+dist: xenial
+language: bash
+env:
+  global:
+    - BUILDKIT_HOST=tcp://0.0.0.0:1234
+    - DOCKER_CLI_EXPERIMENTAL=enabled
+    - ARCHITECTURES="amd64 arm/v6 arm/v7 arm64"
+    - PREFER_BUILDCTL="1"
+    - secure: B2OrfNhj64YLAqPs78svNn73Brl1lVNQOE6ZyYUviBDhFMJBDfmlBU+BZqn8Qz0AGVjEWAhhlsBdnQRbbiLcpQfGIx8ODznjFIzL9PQGw6Eg35YslhvFu0QNLIW0eqXbFJZmI1SMTgk28zLW+w0XIC5E7yHiPZ5kqNchNuf54c/CGDnpBtucUh8y8WZ0Zmpr3HlMWEaUjCk7TEON+ha/y/MbAUvw4Flcuz4Pd2rC7e5UI40DNeAFg0NdMuoswZ7gmG5nXXw6tBx+VgxOTu2s8zGAHjuMMKEAeBOHN9ku8VjAtvHpFoxbH+gTTkms+rtZZH5DsoEPR6IDJWPiRXtV3P1FJ9T4XSmxSIHAF1fpo4XDpHu59hbCGgIijFQ9DT1FI5XLhUdaf1AvOd4xbebuXS+w/FG8EhvDSAV6kzy0uU9OkzjDvS2Vs0R0vweuAXHUQFAItsaxsqIQAuYhU5tiCM2DLlSz636PE86irPUzaDlZxa8oNuq3EDlG5MTaUjdQTYeZqmsq7ux0A/b2N6/mSh/UdiIILTYAWJe0tTAmTKdoFOmWzRyjnnbUTk9jACy6f3ed3ztfWasRxHR8GqiucdjmNLfQ76u5h3WrpyAlpxGJtCieLmsE7SjRbLzvd8GSZVsT+n2qCBoB1oo2K1jPh2m0+m02Q89SLrAg55yl4jo=
+    - secure: sz3kGaIcF/u2VAvIIY80AK/UaMhqTPf34B/CxH/6d5p2EKU6Z7bZEluV7CPFmXmkKHA/JqRkw44wu+Du0U2IyzkXxIjgobx/tHjdm6qvUxd7n2eUImVD1qr/n29Gm72E7fWt1yNNuernXDjqQJCV53YxIT4tjvajbyVNW3uHwgCRrmmCSVUOwtcxyaUWj1uzMGv7EWPELXynoq0+T6IIofQWWwXLbxLCD0uZWHksXYK3XdbDLc5QokU4FL2JT2q9fXoJLDtiNq2H2+SYoh/ozdl1e5cOVmYbMnsvTFLEJzAtxslMGJ0TTAy79y9vmQXXPK1Jj6zWCvq2c75OVIB3yb+2pZNQcnrluI/GIS/u0h80H6/VL3vdCyAlwkt4AbLiEhuTNFpvca++fbGFYBTTRomS0G065NzxgbrTEGQkib9F3JczjfbyQh3P3WcUncClObtFY/pCi9Kkfh2ohcoNLcBZvm21nCp4oCpq/mgTg5JTIvCrJjWWj16vEb8OvvxYuMazp7htz+F57xkkyNkGxQAQTPcHcdCtzvpn814risoB7JxTG0qY9pSRP4xmTepPm9DMtJRi2PVZ/rTohY4qRvisWs4V1VW5PRAqGHDb1WUIsgZ4nYU+rLaq3+oqsuQye1PB21pQpGyp1X8OWKpzOu/nFXTfaKM0kfmL4P4u0+4=
+services:
+  - docker
+addons:
+  apt:
+    packages:
+    - docker-ce
+before_install:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - sudo docker run --privileged linuxkit/binfmt:v0.6
+  - sudo docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest
+    --addr tcp://0.0.0.0:1234
+    --oci-worker-platform linux/amd64 
+    --oci-worker-platform linux/arm/v6 
+    --oci-worker-platform linux/arm/v7 
+    --oci-worker-platform linux/arm64
+  - sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
+script:
+  - bash ./travis/build.sh --tag test
+deploy:
+  - provider: script
+    script: bash ./travis/build.sh --tag latest --push
+    on:
+      branch: master
+  - provider: script
+    script: bash ./travis/build.sh --auto-tag --push
+    on:
+      branch: master
+  - provider: script
+    script: bash ./travis/build.sh --tag beta --monitor-branch beta --push
+    on:
+      branch: master
+  - provider: script
+    script: bash ./travis/build.sh --tag $TRAVIS_TAG --push
+    on:
+      tags: true
+notifications:
+  email: false

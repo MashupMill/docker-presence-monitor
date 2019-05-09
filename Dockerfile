@@ -1,4 +1,6 @@
-FROM arm32v6/alpine:latest
+FROM alpine:latest
+
+ARG MONITOR_BRANCH=master
 
 VOLUME /config
 COPY entrypoint.sh /entrypoint.sh
@@ -18,10 +20,11 @@ RUN apk add --no-cache \
         bluez-btmon \
     && git clone git://github.com/andrewjfreyer/monitor /monitor \
     && cd /monitor \
+    && git checkout $MONITOR_BRANCH \
     && touch .pids \
     && touch .previous_version \
     # setup script in /usr/local/bin so we can run just `monitor` and it will put us in the correct directory and also default the config directory to /config
-    && echo -e '#!/usr/bin/env bash\n( cd /monitor && bash ./monitor.sh -D "/config" "${@}" )' > /usr/local/bin/monitor \
+    && echo -e '#!/usr/bin/env bash\n( cd /monitor && exec bash ./monitor.sh -D "/config" "${@}" )' > /usr/local/bin/monitor \
     # make things executable
     && chmod a+x /usr/local/bin/monitor \
     && chmod a+x monitor.sh \
