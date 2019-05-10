@@ -5,13 +5,15 @@ if [[ ! -z "$DEBUG_ENTRY" ]]; then
 fi
 
 cleanup() {
-    wait
+    if [[ $pid -gt 0 ]]; then
+        kill $pid
+    fi
     service bluetooth stop
     service dbus stop
     exec echo
 }
 
-trap "cleanup" EXIT
+trap "cleanup" EXIT INT TERM
 
 service dbus start
 service bluetooth start
@@ -24,7 +26,9 @@ if [[ ! -z "$1" ]] && ( [[ -f "$1" ]] || command -v $1 &> /dev/null );  then
     "${@}"
     exit $?
 else
-    ./monitor.sh -D /config "${@}"
+    monitor "${@}" &
+    pid=$!
+    wait
     exit $?
 fi
 
