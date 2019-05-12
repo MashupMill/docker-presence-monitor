@@ -21,7 +21,15 @@ RUN apk add --no-cache \
     && git clone git://github.com/andrewjfreyer/monitor /monitor
 
 COPY entrypoint.sh /entrypoint.sh
-ENV PREF_CONFIG_DIR=/config
+ENV PREF_CONFIG_DIR=/config \
+    PREF_ARRIVAL_SCAN_ATTEMPTS=1 \
+    PREF_DEPART_SCAN_ATTEMPTS=2 \
+    PREF_BEACON_EXPIRATION=240 \
+    PREF_MINIMUM_TIME_BETWEEN_SCANS=15 \
+    PREF_PASS_FILTER_ADV_FLAGS_ARRIVE=".*" \
+    PREF_PASS_FILTER_MANUFACTURER_ARRIVE=".*" \
+    PREF_FAIL_FILTER_ADV_FLAGS_ARRIVE="NONE" \
+    PREF_FAIL_FILTER_MANUFACTURER_ARRIVE="NONE"
 
 RUN cd /monitor \
     && git checkout $MONITOR_BRANCH \
