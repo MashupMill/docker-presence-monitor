@@ -31,8 +31,8 @@ EOF
 fi
 
 ## behavior_preferences
-if [[ ! -f "/${PREF_CONFIG_DIR}/behavior_prerences" ]]; then
-    tee "/${PREF_CONFIG_DIR}/behavior_prerences" > /dev/null  <<EOF
+if [[ ! -f "/${PREF_CONFIG_DIR}/behavior_preferences" ]]; then
+    tee "/${PREF_CONFIG_DIR}/behavior_preferences" > /dev/null  <<EOF
 # ---------------------------
 #                               
 # BEHAVIOR PREFERENCES
