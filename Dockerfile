@@ -46,7 +46,6 @@ RUN cd /monitor \
     # make things executable
     && ln -s /monitor/monitor.sh /usr/local/bin/monitor \
     && chmod a+x monitor.sh \
-    && chmod a+x /entrypoint.sh \
     # link the public name cache to the config directory ... i think there's a bug in monitor.sh where it doesn't consistently reference the same path to this...sometimes it looks in $base_directory (which we have as /config) and sometimes its in the app root (i.e. /monitor)
     && ln -s /config/.public_name_cache .public_name_cache \
     # no systemctl ... this keeps the error out about it
@@ -90,7 +89,8 @@ RUN cd /monitor \
 
 WORKDIR /monitor
 
-ENTRYPOINT ["/entrypoint.sh"]
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["bash", "/entrypoint.sh"]
 
 
 # docker build --tag mashupmill/presence-monitor . && docker run --rm -it --name monitor --net host --privileged --volume ~/monitor/config:/config mashupmill/presence-monitor -b -r

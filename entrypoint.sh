@@ -106,7 +106,7 @@ fi
 
 # if first parameter is a valid command, then we will execute that
 # otherwise we will just send all the parameters to monitor.sh
-if [[ ! -z "$1" ]] && ( [[ -f "$1" ]] || command -v $1 &> /dev/null );  then
+if [[ ! -z "$1" ]] && [[ ${1:0:1} != "-" ]] && ( [[ -f "$1" ]] || command -v "$1" &> /dev/null );  then
     "${@}"
     exit $?
 else
