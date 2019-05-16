@@ -18,6 +18,7 @@ RUN apk add --no-cache \
         bluez \
         bluez-deprecated \
         bluez-btmon \
+        dumb-init \
     && git clone git://github.com/andrewjfreyer/monitor /monitor
 
 COPY entrypoint.sh /entrypoint.sh
@@ -90,7 +91,7 @@ RUN cd /monitor \
 WORKDIR /monitor
 
 COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["bash", "/entrypoint.sh"]
+ENTRYPOINT ["dumb-init", "--", "/entrypoint.sh"]
 
 
 # docker build --tag mashupmill/presence-monitor . && docker run --rm -it --name monitor --net host --privileged --volume ~/monitor/config:/config mashupmill/presence-monitor -b -r

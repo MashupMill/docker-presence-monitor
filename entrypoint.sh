@@ -110,9 +110,7 @@ if [[ ! -z "$1" ]] && [[ ${1:0:1} != "-" ]] && ( [[ -f "$1" ]] || command -v "$1
     "${@}"
     exit $?
 else
-    monitor "${@}" &
-    pid=$!
-    wait
+    monitor "${@}"
     exit $?
 fi
 
