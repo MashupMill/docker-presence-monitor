@@ -38,7 +38,8 @@ ENV PREF_CONFIG_DIR=/config \
     MQTT_TOPICPATH=monitor \
     MQTT_PUBLISHER_IDENTITY= \
     MQTT_CERTIFICATE_PATH= \
-    MQTT_VERSION=
+    MQTT_VERSION= \
+    LAST_MSG_DELAY=30
 
 RUN cd /monitor \
     && git checkout $MONITOR_BRANCH \
@@ -91,7 +92,9 @@ RUN cd /monitor \
 WORKDIR /monitor
 
 COPY entrypoint.sh /entrypoint.sh
+COPY health.sh /usr/local/bin/health
 ENTRYPOINT ["dumb-init", "--", "/entrypoint.sh"]
+HEALTHCHECK CMD health
 
 
 # docker build --tag mashupmill/presence-monitor . && docker run --rm -it --name monitor --net host --privileged --volume ~/monitor/config:/config mashupmill/presence-monitor -b -r

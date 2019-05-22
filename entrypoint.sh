@@ -104,6 +104,10 @@ mqtt_version="\${MQTT_VERSION}"
 EOF
 fi
 
+# write out the timestamp of the last msg received
+date +%s > last_msg
+while true; do read line <main_pipe && date +%s > last_msg; done &
+
 # if first parameter is a valid command, then we will execute that
 # otherwise we will just send all the parameters to monitor.sh
 if [[ ! -z "$1" ]] && [[ ${1:0:1} != "-" ]] && ( [[ -f "$1" ]] || command -v "$1" &> /dev/null );  then
