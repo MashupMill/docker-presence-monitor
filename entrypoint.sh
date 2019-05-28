@@ -106,7 +106,7 @@ fi
 
 # write out the timestamp of the last msg received
 date +%s > last_msg
-while true; do read line <main_pipe && date +%s > last_msg; done &
+while true; do [[ -e main_pipe ]] && read line < main_pipe && date +%s > last_msg; done &
 
 # if first parameter is a valid command, then we will execute that
 # otherwise we will just send all the parameters to monitor.sh
