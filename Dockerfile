@@ -89,6 +89,9 @@ RUN cd /monitor \
     && touch /run/openrc/softlevel \
     && openrc
 
+# patch the online message to use QOS 1
+RUN sed -i 's/-m "online" -q "2"/-m "online" -q "1"/' /monitor/support/mqtt
+
 WORKDIR /monitor
 
 COPY entrypoint.sh /entrypoint.sh
